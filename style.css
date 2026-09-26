@@ -1,0 +1,138 @@
+:root {
+    --bg: #0b0b0f;
+    --panel: #111317;
+    --panel-alt: #171d26;
+    --text: #f5f7fa;
+    --muted: #d5dae2;
+    --gold: #f4b942;
+    --gold-soft: #ffd56a;
+    --line: rgba(255, 255, 255, 0.08);
+    --shadow: rgba(0, 0, 0, 0.45);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(180deg, #07080d 0%, #121821 100%);
+    color: var(--text);
+}
+
+.topbar {
+    background-color: rgba(12, 12, 12, 0.95);
+    border-bottom: 1px solid var(--line);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+    padding: 24px 36px;
+}
+
+.title-text {
+    margin: 0;
+    color: var(--text);
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 900;
+    letter-spacing: -0.06em;
+}
+
+.title-text span {
+    color: var(--gold);
+}
+
+.main-spot {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 50px 24px 80px;
+}
+
+.description {
+    background: rgba(17, 19, 23, 0.82);
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    box-shadow: 0 18px 30px var(--shadow);
+    padding: 38px 28px;
+}
+
+.intro {
+    margin: 0;
+    color: var(--muted);
+    font-size: clamp(1.05rem, 2vw, 1.5rem);
+    line-height: 1.7;
+}
+
+.key-words {
+    margin-top: 12px;
+    margin-bottom: 0;
+    color: var(--gold-soft);
+    font-weight: 800;
+    font-size: clamp(1.1rem, 2vw, 1.7rem);
+}
+
+.feature-boxes {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    margin-top: 34px;
+}
+
+.feature-box {
+    background: linear-gradient(135deg, rgba(244, 185, 66, 0.12), rgba(255,255,255,0.02));
+    border: 1px solid rgba(244, 185, 66, 0.18);
+    border-radius: 18px;
+    padding: 24px 20px;
+}
+
+.feature-label {
+    display: inline-block;
+    color: var(--gold-soft);
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
+.feature-box h2 {
+    margin: 0;
+    font-size: clamp(1.2rem, 2vw, 2rem);
+    letter-spacing: -0.04em;
+}
+
+.section-block {
+    margin-top: 40px;
+}
+
+.section-name {
+    margin: 0 0 12px;
+    font-size: clamp(1.6rem, 2.5vw, 2.4rem);
+    font-weight: 800;
+    color: var(--text);
+}
+
+.divider {
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--gold), transparent);
+    border-radius: 999px;
+}
+
+@media (max-width: 640px) {
+    .topbar {
+        padding: 20px 20px;
+    }
+
+    .main-spot {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .description {
+        padding: 26px 18px;
+    }
+
+    .feature-boxes {
+        grid-template-columns: 1fr;
+    }
+}

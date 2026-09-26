@@ -1,2 +1,0 @@
-This is a placeholder download file for the VR demo.
-Replace this file with a real build when you are ready.
