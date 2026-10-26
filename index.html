@@ -1,0 +1,284 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101014">
+  <meta name="description" content="Discover and play games on Phantom Gamez.">
+  <title>Phantom Gamez</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <header class="nav-bar">
+    <a class="title" href="./" aria-label="Phantom Gamez home">
+      Phantom <span>Gamez</span>
+    </a>
+
+    <form id="search-form" class="search-game" role="search">
+      <input
+        type="search"
+        id="game-search"
+        placeholder="Search games..."
+        aria-label="Search games"
+        autocomplete="off"
+      >
+      <button class="search-button" type="submit">Search</button>
+    </form>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-label">
+        <span class="status-dot"></span>
+        YOUR NEXT ADVENTURE STARTS HERE
+      </div>
+      <h1>Enter the <span>Game Zone.</span></h1>
+      <p>Discover new worlds. Play your next adventure.</p>
+      <a class="explore-button" href="#games-section">Explore Games ↓</a>
+    </section>
+
+    <section class="library">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">THE LIBRARY</p>
+          <h2>Explore Games</h2>
+          <p>Find your next adventure.</p>
+        </div>
+        <button id="refresh-button" class="refresh-button" type="button">
+          ↻ Refresh
+        </button>
+      </div>
+
+      <p id="search-status" class="search-status" aria-live="polite">
+        Connecting to the game library...
+      </p>
+
+      <div id="error-message" class="error-message" hidden>
+        <h3>Couldn't load the game library</h3>
+        <p id="error-details">
+          Check the Apps Script URL and its deployment permissions.
+        </p>
+        <button id="retry-button" class="search-button" type="button">
+          Try Again
+        </button>
+      </div>
+
+      <section class="games-section" id="games-section"
+        aria-label="Available games"></section>
+
+      <div id="no-results" class="no-results" hidden>
+        <div class="empty-icon">⌕</div>
+        <h2>No games found</h2>
+        <p>Try a different game name or keyword.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <a class="footer-logo" href="./">Phantom <span>Gamez</span></a>
+    <p>© 2026 Phantom Gamez. Made for players.</p>
+  </footer>
+
+  <script>
+    // IMPORTANT: Replace this with your deployed Apps Script /exec URL.
+    const API_URL = "https://script.google.com/macros/s/AKfycbystxc3-kLcP-d6HTGTiO_lhJg_DeF6SYbVA6u5eHt4ykhjzm3pKkpb4EsgT8JU4eO8/exec";
+
+    const searchForm = document.getElementById("search-form");
+    const searchInput = document.getElementById("game-search");
+    const gamesSection = document.getElementById("games-section");
+    const searchStatus = document.getElementById("search-status");
+    const noResults = document.getElementById("no-results");
+    const errorMessage = document.getElementById("error-message");
+    const errorDetails = document.getElementById("error-details");
+    const refreshButton = document.getElementById("refresh-button");
+    const retryButton = document.getElementById("retry-button");
+
+    let allGames = [];
+
+    function makeElement(tag, className, text) {
+      const element = document.createElement(tag);
+      if (className) element.className = className;
+      if (text !== undefined) element.textContent = text;
+      return element;
+    }
+
+    function createGameCard(game) {
+      const card = makeElement("article", "game-card");
+      card.dataset.name = game.name || "";
+      card.dataset.description = game.description || "";
+
+      const coverFrame = makeElement("div", "cover-frame");
+
+      if (game.cover) {
+        const image = makeElement("img", "title-image");
+        image.src = game.cover;
+        image.alt = (game.name || "Game") + " cover";
+        image.loading = "lazy";
+        image.onerror = () => {
+          image.remove();
+          coverFrame.classList.add("cover-placeholder");
+          coverFrame.textContent = "PHANTOM GAMEZ";
+        };
+        coverFrame.appendChild(image);
+      } else {
+        coverFrame.classList.add("cover-placeholder");
+        coverFrame.textContent = "PHANTOM GAMEZ";
+      }
+
+      const content = makeElement("div", "game-content");
+      content.appendChild(makeElement("span", "game-tag", "GAME"));
+      content.appendChild(makeElement("h3", "game-name", game.name));
+      content.appendChild(
+        makeElement(
+          "p",
+          "info-of-game",
+          game.description || "Discover " + game.name + "."
+        )
+      );
+
+      const button = makeElement("button", "playe-button", "Play Game");
+      button.type = "button";
+
+      if (!game.playUrl) {
+        button.textContent = "Not Hosted Yet";
+        button.classList.add("not-hosted");
+        button.title = "This game needs a playable web hosting URL.";
+      }
+
+      button.addEventListener("click", () => {
+        if (game.playUrl) {
+          // Only allow normal web URLs.
+          try {
+            const url = new URL(game.playUrl);
+            if (url.protocol !== "https:" && url.protocol !== "http:") {
+              throw new Error("Unsupported URL protocol");
+            }
+            window.open(url.href, "_blank", "noopener,noreferrer");
+          } catch (error) {
+            alert("This game's play URL is invalid. Check GAME_URLS in Code.gs.");
+          }
+        } else {
+          const openFolder = confirm(
+            game.name +
+            " has been found in Google Drive, but it does not have a " +
+            "playable web URL yet.\n\nOpen its Drive folder instead?"
+          );
+
+          if (openFolder && game.folderUrl) {
+            window.open(game.folderUrl, "_blank", "noopener,noreferrer");
+          }
+        }
+      });
+
+      content.appendChild(button);
+      card.append(coverFrame, content);
+      return card;
+    }
+
+    function renderGames(games) {
+      gamesSection.replaceChildren();
+
+      for (const game of games) {
+        gamesSection.appendChild(createGameCard(game));
+      }
+
+      applySearch();
+    }
+
+    function applySearch() {
+      const query = searchInput.value.trim().toLowerCase();
+      let visibleCount = 0;
+
+      for (const card of gamesSection.querySelectorAll(".game-card")) {
+        const searchable = (
+          card.dataset.name + " " +
+          card.dataset.description + " " +
+          card.textContent
+        ).toLowerCase();
+
+        const matches = searchable.includes(query);
+        card.hidden = !matches;
+
+        if (matches) visibleCount++;
+      }
+
+      noResults.hidden = visibleCount !== 0 || allGames.length === 0;
+
+      if (query) {
+        searchStatus.textContent =
+          visibleCount + " matching game" +
+          (visibleCount === 1 ? "" : "s");
+      } else {
+        const hostedCount = allGames.filter(game => game.playUrl).length;
+        searchStatus.textContent =
+          allGames.length + " games discovered · " +
+          hostedCount + " ready to play";
+      }
+    }
+
+    async function loadGames() {
+      if (
+        !API_URL.startsWith("https://script.google.com/") ||
+        API_URL.includes("PASTE_YOUR")
+      ) {
+        errorMessage.hidden = false;
+        errorDetails.textContent =
+          "Paste your deployed Google Apps Script web app URL into API_URL.";
+        searchStatus.textContent = "Setup required";
+        return;
+      }
+
+      refreshButton.disabled = true;
+      refreshButton.textContent = "Loading...";
+      errorMessage.hidden = true;
+      searchStatus.textContent = "Loading games from Google Drive...";
+
+      try {
+        const response = await fetch(API_URL);
+
+        if (!response.ok) {
+          throw new Error("HTTP error " + response.status);
+        }
+
+        const data = await response.json();
+
+        if (!data.success) {
+          throw new Error(data.error || "The API reported an error.");
+        }
+
+        allGames = Array.isArray(data.games) ? data.games : [];
+        renderGames(allGames);
+
+        if (allGames.length === 0) {
+          searchStatus.textContent =
+            "No game folders containing index.html were found.";
+        }
+      } catch (error) {
+        console.error("Phantom Gamez API error:", error);
+        errorMessage.hidden = false;
+        errorDetails.textContent =
+          "Could not read the game list. Check your Apps Script deployment " +
+          "access and URL. Details: " + error.message;
+        searchStatus.textContent = "Unable to load games";
+      } finally {
+        refreshButton.disabled = false;
+        refreshButton.textContent = "↻ Refresh";
+      }
+    }
+
+    searchInput.addEventListener("input", applySearch);
+
+    searchForm.addEventListener("submit", event => {
+      event.preventDefault();
+      applySearch();
+    });
+
+    refreshButton.addEventListener("click", loadGames);
+    retryButton.addEventListener("click", loadGames);
+
+    loadGames();
+  </script>
+</body>
+</html>
