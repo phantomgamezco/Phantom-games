@@ -1,0 +1,67 @@
+<html>
+  <head>
+    <title>Flowers</title>
+    <script src="https://aframe.io/releases/1.8.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-physics-system@v4.2.2/dist/aframe-physics-system.min.js"></script>
+    <script src="locomotion-player.js"></script>
+    <script src="sky.js"></script>
+    <script src="enemy.js"></script>
+    <script src="camera lock.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/loaders/FBXLoader.js"></script>
+  </head>
+  <body>
+    <!-- map -->
+    <a-scene loading-screen="dotsColor: red; backgroundColor: black" obb-collider="showColliders: true" physics="debug:true">
+      <a-sky material="shader: three-color-gradient; topColor: #0033cc; middleColor: #80c1ff; bottomColor: orange"></a-sky>
+
+      <a-assets>
+        <a-asset-item id="flower" src="models/Meshy_AI_Dreadbloom_1027162138_texture.glb"></a-asset-item>
+      </a-assets>
+
+      <!-- player -->
+      <a-gorilla-tag
+        id="player" 
+        hand-color="white" 
+        hand-shape="sphere" 
+        hand-collision="hull"
+        hand-size="0.12"
+        hand-offset="0 0 0"
+        player-collision="box"
+        player-height=".6"
+        player-rotate="180 0 0"
+        player-position="0 0 0"
+        camera-y=".5"
+        camera-lock="true">
+      </a-gorilla-tag>
+      
+      <a-box height=".1" width="40" depth="40" color="#333333" static-body="hull"></a-box>
+
+      <!-- enemy -->
+      <a-gltf-model src="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/Duck/glTF-Binary/Duck.glb" position="0 0 -3"></a-gltf-model>
+      <!-- safe zones -->
+      <safe-zone 
+        position="0 1 0" 
+        scale="3 2 3" 
+        show-safe-zone="true" 
+        color="lime">
+      </safe-zone>
+
+      <!-- enemy path -->
+      <enemy-walk-path
+        position="10.5 1.1 0"
+        scale="18 2 40"
+        color="cyan">
+      </enemy-walk-path>
+      <enemy-walk-path
+        position="-10.5 1.1 0"
+        scale="18 2 40"
+        color="cyan">
+      </enemy-walk-path>
+      <enemy-walk-path
+      position="0 1.1 10"
+      scale="10 2 10"
+      color="cyan">
+      </enemy-walk-path>
+    </a-scene>
+  </body>
+</html>
